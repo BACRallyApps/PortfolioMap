@@ -1,0 +1,14 @@
+{
+   "name": "FeatureMap",
+   "className": "CustomApp",
+   "server": "demo02.rallydev.com",
+   "sdk": "2.0rc2",
+   "remote_javascript": [],
+   "javascript": [
+      "src/App.js"
+   ],
+   "remote_css": [],
+   "css": [
+      "styles/app.css"
+   ]
+}
