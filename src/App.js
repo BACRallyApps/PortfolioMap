@@ -491,7 +491,7 @@ Ext.define('CustomApp', {
     data.type    = 'initiative';
     data.name    = me.initiatives[initiativeId].Name || me.initiatives[initiativeId].get('Name');
     //data.fidLink = me.fidTemplate.getLink({
-      //record: me.initiatives[initiativeId].data, 
+      //record: me.initiatives[initiativeId].data,
       //text: me.initiatives[initiativeId].get('FormattedID'), showHover: false
     //});
 
@@ -640,7 +640,7 @@ Ext.define('CustomApp', {
     if (data.storySize) {
       data.size = data.size + data.storySize + ' SP';
     }
-    data.color   = record.raw.Parent ? record.raw.Parent.DisplayColor || 'black' : 'black';
+    data.color   = record.raw.DisplayColor ? record.raw.DisplayColor || 'black' : 'black';
     data.fidLink = me.fidTemplate.getLink({record: record.data, text: record.get('FormattedID'), showHover: false});
 
     return data;
