@@ -29,6 +29,10 @@ var parentRef = function (a) {
   return (a.raw.Parent ? a.raw.Parent._ref : '/0');
 };
 
+var projectRef = function (a) {
+  return Rally.util.Ref.getRefObject(a.raw.Project).getRelativeUri();
+};
+
 Ext.define('CustomApp', {
   extend: 'Rally.app.App',
   mixins: {
@@ -419,7 +423,9 @@ Ext.define('CustomApp', {
     });
 
     _.each(_.keys(me.projects), function (p) {
-      me.addProject(p);
+      if (_(me.features).filter(function (f) { return projectRef(f) === p; }).value().length) {
+        me.addProject(p);
+      }
     });
     me.resumeLayouts(true);
     me.add(me.table);
@@ -459,6 +465,7 @@ Ext.define('CustomApp', {
     });
 
     _(me.featuresByRelease[releaseName])
+      .filter(function (f) { return projectRef(f) === projectId; })
       .map(function (f) { return parentRef(f); })
       .unique()
       .each(function (i) { 
@@ -498,23 +505,30 @@ Ext.define('CustomApp', {
 
     featureContainer = Ext.create('Ext.container.Container', {
       layout: {
-        type: 'hbox'
+        type: 'vbox'
       }
     });
 
     container.add(featureContainer);
 
+    console.log('looking for features', initiativeId);
     _(me.featuresByRelease[releaseName])
-      .filter(function (f) { return f.data.Parent.ObjectID === initiativeId; })
+      .filter(function (f) { 
+        var oid = parentRef(f);
+        console.log(typeof oid, typeof initiativeId, oid, initiativeId);
+        return oid + '' === initiativeId;
+      })
       .unique()
+      .filter(function (f) { return projectRef(f) === projectId; })
       .each(function (f) { 
-        container.add(me.addFeature(projectId, initiativeId, f.data.ObjectID));
+        featureContainer.add(me.addFeature(projectId, initiativeId, f.get('_ref')));
       });
 
     return container;
   },
 
   addFeature: function (projectId, initiativeId, featureId) {
+    console.log('Add feature', projectId, initiativeId, featureId);
     var me      = this;
     var i       = 0;
     var data    = me._dataForFeature(me.features[featureId]);

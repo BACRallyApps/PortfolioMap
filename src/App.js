@@ -57,6 +57,13 @@ Ext.define('CustomApp', {
 
     this.addEvents('load');
 
+    this.ctx = {
+      workspace: '/workspace/711891',
+      project: null
+    };
+
+    //this.ctx = this.getContext().getDataContext();
+
     this.fidTemplate = Rally.nav.DetailLink;
     this.cardTemplate = new Ext.XTemplate(
       '<tpl if="color != null">',
@@ -186,6 +193,7 @@ Ext.define('CustomApp', {
       autoLoad: true,
       remoteFilter: false,
       model: 'TypeDefinition',
+      context: me.ctx,
       sorters: [{
         property: 'Ordinal',
         direction: 'Desc'
@@ -242,6 +250,7 @@ Ext.define('CustomApp', {
     var featureStore = Ext.create('Rally.data.wsapi.Store', {
       model: me.piTypes[0].get('TypePath'),
       fetch: ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor', 'Release'],
+      context: me.ctx,
       filters: [{
         property: 'Release.ReleaseStartDate',
         operator: '>=',
@@ -269,11 +278,13 @@ Ext.define('CustomApp', {
 
     var projectStore = Ext.create('Rally.data.wsapi.Store', {
       model: 'Project',
+      context: me.ctx,
       fetch: true
     });
 
     var releaseStore = Ext.create('Rally.data.wsapi.Store', {
       model: 'Release',
+      context: me.ctx,
       fetch: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
       filters: [{
         property: 'ReleaseStartDate',
@@ -293,6 +304,7 @@ Ext.define('CustomApp', {
     var nullInitiative = Ext.create('Deft.promise.Deferred');
     Rally.data.ModelFactory.getModel({
       type: me.piTypes[1].get('TypePath'),
+      context: me.ctx,
       success: function (model) {
         var blank = Ext.create(model, {
           ObjectID: 0,
