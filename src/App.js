@@ -58,12 +58,12 @@ Ext.define('CustomApp', {
 
     this.addEvents('load');
 
-    this.ctx = {
-      workspace: '/workspace/711891',
-      project: null
-    };
+    //this.ctx = {
+      //workspace: '/workspace/711891',
+      //project: null
+    //};
 
-    //this.ctx = this.getContext().getDataContext();
+    this.ctx = this.getContext().getDataContext();
 
     this.fidTemplate = Rally.nav.DetailLink;
     this.cardTemplate = new Ext.XTemplate(
@@ -233,7 +233,7 @@ Ext.define('CustomApp', {
   launch: function launch() {
     var me = this;
 
-    me.chooseReleases();
+    //me.chooseReleases();
 
     me.subscribe(me, Rally.Message.objectUpdate, me._onObjectUpdated, me);
 
