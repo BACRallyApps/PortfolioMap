@@ -44,6 +44,7 @@ Ext.define('CustomApp', {
   features: null,
   initiatives: null,
   releases: null,
+  selectedReleases: {},
 
   layout: {
     type: 'vbox'
@@ -100,10 +101,55 @@ Ext.define('CustomApp', {
 
   getOptions: function () {
     return [{
+      text: 'Choose Releases',
+      handler: this.chooseReleases,
+      scope: this
+    }, {
       text: 'Show Color Legend',
       handler: this.showLegend,
       scope: this
     }];
+  },
+
+  chooseReleases: function () {
+    var me = this;
+
+    if (this.releaseChooserDlg) {
+      this.releaseChooserDlg.show();
+      return;
+    }
+
+    this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
+      title: 'Select Releases',
+      draggable: true,
+      width: 800,
+      closable: true,
+      items: [{
+        xtype: 'rallygrid',
+        model: 'Release',
+        itemId: 'releasechoosergrid',
+        context: me.ctx,
+        columnCfgs: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
+        selModel: Ext.create('Rally.ui.selection.CheckboxModel', {
+          mode: 'MULTI',
+          listeners: {
+            select: function (t, record, index, eOpts) {
+              me.selectedReleases[record.get('ObjectID')] = record;
+            },
+            deselect: function (t, record, index, eOpts) {
+              delete me.selectedReleases[record.get('ObjectID')];
+            }
+          }
+        }),
+        listeners: {
+          load: function (t) {
+            t.getSelectionModel().select(_.values(selectedReleases), false, true);
+          }
+        }
+      }]
+    });
+
+    this.releaseChooserDlg.show();
   },
 
   _buildLegendEntry: function (label, color) {
@@ -186,6 +232,8 @@ Ext.define('CustomApp', {
 
   launch: function launch() {
     var me = this;
+
+    me.chooseReleases();
 
     me.subscribe(me, Rally.Message.objectUpdate, me._onObjectUpdated, me);
 
