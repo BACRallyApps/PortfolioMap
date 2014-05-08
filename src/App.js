@@ -130,6 +130,7 @@ Ext.define('CustomApp', {
       draggable: true,
       width: 800,
       closable: true,
+      closeAction: 'hide',
       items: [{
         xtype: 'rallygrid',
         model: 'Release',
