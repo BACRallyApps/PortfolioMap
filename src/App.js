@@ -152,6 +152,7 @@ Ext.define('CustomApp', {
       }]
     });
 
+    console.log('showing');
     this.releaseChooserDlg.show();
   },
 
