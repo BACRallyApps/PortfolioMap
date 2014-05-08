@@ -115,16 +115,15 @@ Ext.define('CustomApp', {
     var me = this;
 
     if (this.releaseChooserDlg) {
-      console.log('showing');
       this.releaseChooserDlg.show();
       return;
     }
 
     var ctx = me.getContext().getDataContext();
+    var selectedReleases;
     ctx.projectScopeUp = false;
     ctx.projectScopeDown = false;
 
-    console.log('creating', ctx);
     this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
       title: 'Select Releases',
       draggable: true,
@@ -143,23 +142,26 @@ Ext.define('CustomApp', {
           mode: 'MULTI',
           listeners: {
             select: function (t, record, index, eOpts) {
-              me.selectedReleases[record.get('ObjectID')] = record;
+              selectedReleases[record.get('ObjectID')] = record;
             },
             deselect: function (t, record, index, eOpts) {
-              delete me.selectedReleases[record.get('ObjectID')];
+              delete selectedReleases[record.get('ObjectID')];
             }
           }
         }),
         listeners: {
           load: function (t) {
-            console.log('data loaded');
             me.releaseChooserDlg.down('#releasechoosergrid').getSelectionModel().select(_.values(me.selectedReleases), false, true);
           }
         }
-      }]
+      }],
+      listeners: {
+        close: function () {
+          me.fireEvent('selectedreleaseschanged', selectedReleases)
+        }
+      }
     });
 
-    console.log('showing');
     this.releaseChooserDlg.show();
   },
 
@@ -438,7 +440,7 @@ Ext.define('CustomApp', {
       .map(function (r) { return r.get('Name'); })
       .value();
 
-    console.log('rels by date', this.releaseNameByDate);
+    //console.log('rels by date', this.releaseNameByDate);
   },
 
   _onLoad: function () {
@@ -458,7 +460,6 @@ Ext.define('CustomApp', {
       .groupBy(function (f) { return f.raw.Release._refObjectName; })
       .value();
 
-    console.log(me);
     me.suspendLayouts();
 
     me.addToContainer({
@@ -573,11 +574,11 @@ Ext.define('CustomApp', {
 
     container.add(featureContainer);
 
-    console.log('looking for features', initiativeId);
+    //console.log('looking for features', initiativeId);
     _(me.featuresByRelease[releaseName])
-      .filter(function (f) { 
+      .filter(function (f) {
         var oid = parentRef(f);
-        console.log(typeof oid, typeof initiativeId, oid, initiativeId);
+        //console.log(typeof oid, typeof initiativeId, oid, initiativeId);
         return oid + '' === initiativeId;
       })
       .unique()
@@ -590,14 +591,14 @@ Ext.define('CustomApp', {
   },
 
   addFeature: function (projectId, initiativeId, featureId) {
-    console.log('Add feature', projectId, initiativeId, featureId);
+    //console.log('Add feature', projectId, initiativeId, featureId);
     var me      = this;
     var i       = 0;
     var data    = me._dataForFeature(me.features[featureId]);
     var storyContainer;
     var storyColumnContainer;
 
-    console.log('Feature', data);
+    //console.log('Feature', data);
 
     var container = Ext.create('Ext.container.Container', {
       layout: {
