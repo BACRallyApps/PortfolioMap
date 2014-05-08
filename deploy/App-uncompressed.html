@@ -67,12 +67,12 @@ Ext.define('CustomApp', {
 
     this.addEvents('load');
 
-    //this.ctx = {
-      //workspace: '/workspace/711891',
-      //project: null
-    //};
+    this.ctx = {
+      workspace: '/workspace/711891',
+      project: null
+    };
 
-    this.ctx = this.getContext().getDataContext();
+    //this.ctx = this.getContext().getDataContext();
 
     this.fidTemplate = Rally.nav.DetailLink;
     this.cardTemplate = new Ext.XTemplate(
