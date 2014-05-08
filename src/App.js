@@ -124,7 +124,7 @@ Ext.define('CustomApp', {
     ctx.projectScopeUp = false;
     ctx.projectScopeDown = false;
 
-    console.log('creating');
+    console.log('creating', ctx);
     this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
       title: 'Select Releases',
       draggable: true,
@@ -134,7 +134,9 @@ Ext.define('CustomApp', {
         xtype: 'rallygrid',
         model: 'Release',
         itemId: 'releasechoosergrid',
-        context: ctx,
+        storeConfig: {
+          context: ctx
+        },
         columnCfgs: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
         selModel: Ext.create('Rally.ui.selection.CheckboxModel', {
           mode: 'MULTI',
