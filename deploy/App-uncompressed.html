@@ -152,7 +152,7 @@ Ext.define('CustomApp', {
         }),
         listeners: {
           load: function (t) {
-            me.releaseChooserDlg.getSelectionModel().select(_.values(selectedReleases), false, true);
+            me.releaseChooserDlg.down('#releasechoosergrid').getSelectionModel().select(_.values(me.selectedReleases), false, true);
           }
         }
       }]
