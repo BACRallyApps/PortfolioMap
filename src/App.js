@@ -115,10 +115,12 @@ Ext.define('CustomApp', {
     var me = this;
 
     if (this.releaseChooserDlg) {
+      console.log('showing');
       this.releaseChooserDlg.show();
       return;
     }
 
+    console.log('creating');
     this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
       title: 'Select Releases',
       draggable: true,
@@ -143,6 +145,7 @@ Ext.define('CustomApp', {
         }),
         listeners: {
           load: function (t) {
+            console.log('data loaded');
             me.releaseChooserDlg.down('#releasechoosergrid').getSelectionModel().select(_.values(me.selectedReleases), false, true);
           }
         }
