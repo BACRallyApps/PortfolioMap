@@ -562,7 +562,6 @@ Ext.define('CustomApp', {
 
             t.getEl().on('dblclick', function(e) {
               e.preventDefault();
-              //console.log('hi', d);
               Rally.nav.Manager.edit(d._ref);
               return false;
             });
@@ -570,48 +569,6 @@ Ext.define('CustomApp', {
           scope: (function (d) { return d; }(data))
         }
       }]
-    });
-
-    storyContainer = Ext.create('Ext.container.Container', {
-      layout: {
-        type: 'hbox'
-      }
-    });
-
-    container.add(storyContainer);
-
-    Ext.Array.each(me.storyRecs, function (story) {
-      var storyId = story.data.ObjectID;
-      var parentId = Rally.util.Ref.getOidFromRef(story.get('Feature')._ref);
-
-      if (!me.projectsByStory[storyId]) {
-        return;
-      }
-
-      if (!me.projectsByStory[storyId][projectId]) {
-        return;
-      }
-
-      if (parseInt(featureId + '', 10) !== parseInt(parentId + '', 10)) {
-        return;
-      }
-
-      if (i >= spc) {
-        i = 0;
-      }
-
-      if (i === 0) {
-        storyColumnContainer = Ext.create('Ext.container.Container', {
-          layout: {
-            type: 'vbox'
-          }
-        });
-
-        storyContainer.add(storyColumnContainer);
-      }
-
-      storyColumnContainer.add(me.addStory(storyId));
-      i++;
     });
 
     return container;
@@ -646,169 +603,6 @@ Ext.define('CustomApp', {
     return data;
   },
 
-  _dataForStory: function (record) {
-    var iStart;
-    var iEnd;
-    var me   = this;
-    var now  = new Date();
-    var data = {
-      name:    record.get('Name'),
-      oid:     record.get('ObjectID'),
-      _ref:    record.get('_ref'),
-      size:    record.get('PlanEstimate'),
-      state:   ('' + record.get('ScheduleState')).toLowerCase(),
-      type:    'story',
-      blocked: record.get('Blocked') ? 'blocked' :'',
-
-      iterationStatus: 'unplanned',
-
-      fidLink: me.fidTemplate.getLink({record: record.data, text: record.get('FormattedID'), showHover: false}),
-
-      _record: record
-    };
-
-    if (record.raw.Iteration) {
-      data.iterationStatus = 'planned';
-
-      iStart = Rally.util.DateTime.fromIsoString(record.raw.Iteration.StartDate);
-      iEnd = Rally.util.DateTime.fromIsoString(record.raw.Iteration.EndDate);
-
-      if (Rally.util.DateTime.getDifference(now, iStart, 'day') >= 0) {
-        data.iterationStatus = 'active';
-        if (!!record.raw.AcceptedDate /*|| (!record.raw.PlanEstimate)*/) {
-          data.iterationStatus = 'done';
-        }
-      }
-
-      if (Rally.util.DateTime.getDifference(now, iEnd, 'day') > 0) {
-        if (!!record.raw.AcceptedDate /*|| (!record.raw.PlanEstimate)*/) {
-          data.iterationStatus = 'done';
-        } else {
-          data.iterationStatus = 'late';
-        }
-      }
-    }
-
-    data.pred_succ = '';
-    if (record.raw.Predecessors.length) {
-      data.pred_succ = "pred";
-      if (_.some(record.raw.Predecessors, function (itm) { return !_.contains(['Accepted', 'Released'], itm.ScheduleState); })) {
-        data.pred_succ = "pred_open";
-      }
-    }
-
-    var recDate;
-    if (record.raw.Iteration) {
-      recDate = Rally.util.DateTime.fromIsoString(record.raw.Iteration.EndDate);
-    }
-    if (record.raw.Successors.length) {
-      data.pred_succ = data.pred_succ ? data.pred_succ + '_succ' : 'succ';
-      if (recDate) {
-        if (_.some(record.raw.Predecessors, function (itm) {
-          if (!itm.Iteration) { return false; }
-
-          var date = Rally.util.DateTime.fromIsoString(itm.Iteration.EndDate);
-          return Rally.util.DateTime.getDifference(recDate, date, 'day') > 0;
-        })) {
-          data.pred_succ = data.pred_succ + '_need';
-        }
-      }
-    }
-
-    return data;
-  },
-
-  addStory: function (storyId) {
-    var me   = this;
-    var data = me._dataForStory(me.stories[storyId]);
-
-    var container = Ext.create('Ext.container.Container', {
-      layout: {
-        type: 'hbox'
-      },
-      items: [{
-        xtype: 'container',
-        layout: 'table',
-        oid: storyId,
-        items: [{
-          xtype: 'box',
-          html: me.cardTemplate.apply(data)
-        }],
-        listeners: {
-          afterrender: function (t) {
-            var d = this;
-            var linkIndicator = t.getEl().select('div.link_indicator').first();
-
-            t.getEl().on('mousedown', function (e) {
-              e.preventDefault();
-            });
-
-            t.getEl().on('dblclick', function(e) {
-              e.preventDefault();
-              Rally.nav.Manager.edit(d._ref);
-              return false;
-            });
-
-            if (linkIndicator) {
-              linkIndicator.on('click', (function (li, sid) { 
-                var preds = me.stories[sid].raw.Predecessors;
-                var succs = me.stories[sid].raw.Successors;
-
-                return function (e) {
-                  e.preventDefault();
-                  var useLocal = false;
-                  var bottom = li.getBottom(useLocal);
-                  var left = li.getLeft(useLocal);
-                  var width = li.getWidth(useLocal);
-                  var path;
-                  var predCards = _(preds).map(function (p) { return Ext.query('.oid-' + p.ObjectID); }).flatten();
-                  var succCards = _(succs).map(function (p) { return Ext.query('.oid-' + p.ObjectID); }).flatten();
-                  var topOffset = me.viewportDiv.dom.parentNode.scrollTop;
-
-                  //console.log('expand indicator', sid, li.getBottom(useLocal), li.getLeft(useLocal), li.getWidth(useLocal));
-                  //console.log('XY', me.viewportDiv.dom);
-                  //console.dir(me.viewportDiv.dom);
-                  //console.dir(succCards);
-
-                  if (me.links) {
-                    _(me.links).each(function (l) { l.remove(); });
-                    me.links = null;
-                  } else {
-                    me.links = [];
-                    predCards.each(function (c) {
-                      var target = Ext.get(c);
-                      path = [];
-                      path.push(['M', left + (~~(width / 2)), topOffset + bottom]);
-                      path.push(['C', left, topOffset + target.getBottom(useLocal) + 100, target.getLeft(useLocal), topOffset + target.getBottom(useLocal) + 50, target.getLeft(useLocal) + 10, topOffset + target.getBottom(useLocal)]);
-
-                      me.links.push(me.canvas.path(path).attr({stroke: 'blue', 'stroke-width': 3}));
-                    });
-                    succCards.each(function (c) {
-                      var target = Ext.get(c);
-                      var p;
-                      path = [];
-                      path.push(['M', left + (~~(width / 2)), topOffset + bottom]);
-                      path.push(['C', left, topOffset + target.getBottom(useLocal) + 100, target.getLeft(useLocal), topOffset + target.getBottom(useLocal) + 50, target.getLeft(useLocal) + 10, topOffset + target.getBottom(useLocal)]);
-
-                      p = me.canvas.path(path).attr({stroke: 'grey', 'stroke-width': 3});
-                      me.links.push(p);
-                    });
-                    if (me.links.length === 0) { me.links = null; }
-                  }
-
-                  return false;
-                };
-              })(linkIndicator, storyId));
-            }
-          },
-          scope: (function (d) { return d; }(data))
-        }
-      }]
-    });
-
-    return container;
-  },
-
   _refreshCard: function (record, dataFn) {
     var me = this;
     var cards = this.query('component[oid=' +  record.get('ObjectID') + ']');
@@ -832,14 +626,10 @@ Ext.define('CustomApp', {
     var dataFn;
 
     fetchF = ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'UserStories', 'Children', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor'];
-    fetchS = ['ObjectID', 'FormattedID', 'Name', 'ScheduleState', 'PlanEstimate', 'Feature', 'Parent', 'Project', 'Blocked', 'BlockedReason', 'Iteration', 'StartDate', 'EndDate', 'AcceptedDate', 'Predecessor', 'Successor'];
 
     if (record.get('_type').toLowerCase().indexOf('portfolioitem') !== -1) {
       fetch = fetchF;
       dataFn = Ext.Function.bind(me._dataForFeature, me);
-    } else {
-      fetch = fetchS;
-      dataFn = Ext.Function.bind(me._dataForStory, me);
     }
 
     me.showMask('Updating...');
