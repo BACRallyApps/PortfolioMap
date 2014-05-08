@@ -141,21 +141,21 @@ Ext.define('CustomApp', {
         itemId: 'releasechoosergrid',
         context: me.ctx,
         columnCfgs: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
-        selModel: Ext.create('Rally.ui.selection.CheckboxModel', {
-          mode: 'MULTI',
-          listeners: {
-            select: function (t, record, index, eOpts) {
-              me.selectedReleases[record.get('ObjectID')] = record;
-            },
-            deselect: function (t, record, index, eOpts) {
-              delete me.selectedReleases[record.get('ObjectID')];
-            }
-          }
-        }),
+        //selModel: Ext.create('Rally.ui.selection.CheckboxModel', {
+          //mode: 'MULTI',
+          //listeners: {
+            //select: function (t, record, index, eOpts) {
+              //me.selectedReleases[record.get('ObjectID')] = record;
+            //},
+            //deselect: function (t, record, index, eOpts) {
+              //delete me.selectedReleases[record.get('ObjectID')];
+            //}
+          //}
+        //}),
         listeners: {
           load: function (t) {
             console.log('data loaded');
-            me.releaseChooserDlg.down('#releasechoosergrid').getSelectionModel().select(_.values(me.selectedReleases), false, true);
+            //me.releaseChooserDlg.down('#releasechoosergrid').getSelectionModel().select(_.values(me.selectedReleases), false, true);
           }
         }
       }]
