@@ -423,7 +423,7 @@ Ext.define('CustomApp', {
 
   processFeatures: function (features) {
     var releases = _.keys(this.selectedReleases);
-    features = _.filter(features, function (f) { return f.raw.Release && _.contains(release, f.raw.Release.ObjectID); });
+    features = _.filter(features, function (f) { return f.raw.Release && _.contains(releases, f.raw.Release.ObjectID); });
     this.featureRecs          = features;
     this.features             = _.indexBy(features, function (feature) { return feature.get('_ref'); });
     this.featuresByInitiative = _.groupBy(features, function (f) { return parentRef(f); });
@@ -445,13 +445,15 @@ Ext.define('CustomApp', {
 
   processReleases: function (releases) {
     var me = this;
+    releases = _.filter(releases, function (release) { return me.selectedReleases[release.get('ObjectID')]; });
+
     this.releases = _(releases)
       .filter(function (release) { return me.selectedReleases[release.get('ObjectID')]; })
       .unique(function (release) { return release.get('Name'); })
       .groupBy(function (release) { return release.get('Name'); })
       .value();
     this.releaseRecs = releases;
-    this.releaseNameByDate = _(releases)
+    this.releaseNameByDate = _(this.releases)
       .unique(function (r) { return r.get('Name'); })
       .sortBy(function (r) { return r.get('ReleaseStartDate'); })
       .map(function (r) { return r.get('Name'); })
