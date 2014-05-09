@@ -154,7 +154,7 @@ Ext.define('CustomApp', {
         }
       }],
       listeners: {
-        close: function () {
+        hide: function () {
           console.log('selected releases changes', selectedReleases);
           me.fireEvent('selectedreleaseschanged', selectedReleases);
         }
