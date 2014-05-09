@@ -120,7 +120,7 @@ Ext.define('CustomApp', {
     }
 
     var ctx = me.getContext().getDataContext();
-    var selectedReleases;
+    var selectedReleases = {};
 
     this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
       title: 'Select Releases',
