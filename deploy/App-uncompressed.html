@@ -149,10 +149,10 @@ Ext.define('CustomApp', {
           mode: 'MULTI',
           listeners: {
             select: function (t, record, index, eOpts) {
-              selectedReleases[record.get('ObjectID')] = record;
+              selectedReleases[record.get('Name')] = record;
             },
             deselect: function (t, record, index, eOpts) {
-              delete selectedReleases[record.get('ObjectID')];
+              delete selectedReleases[record.get('Name')];
             }
           }
         }),
@@ -423,7 +423,7 @@ Ext.define('CustomApp', {
 
   processFeatures: function (features) {
     var releases = _.keys(this.selectedReleases);
-    features = _.filter(features, function (f) { return f.raw.Release && _.contains(releases, f.raw.Release.ObjectID); });
+    features = _.filter(features, function (f) { return f.raw.Release && _.contains(releases, f.raw.Release._refObjectName); });
     this.featureRecs          = features;
     this.features             = _.indexBy(features, function (feature) { return feature.get('_ref'); });
     this.featuresByInitiative = _.groupBy(features, function (f) { return parentRef(f); });
@@ -445,7 +445,7 @@ Ext.define('CustomApp', {
 
   processReleases: function (releases) {
     var me = this;
-    releases = _.filter(releases, function (release) { console.log(typeof release.get('ObjectID')); return me.selectedReleases[release.get('ObjectID')]; });
+    releases = _.filter(releases, function (release) { return me.selectedReleases[release.get('Name')]; });
 
     this.releases = _(releases)
       .unique(function (release) { return release.get('Name'); })
