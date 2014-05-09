@@ -58,12 +58,12 @@ Ext.define('CustomApp', {
 
     this.addEvents('load');
 
-    this.ctx = {
-      workspace: '/workspace/711891',
-      project: null
-    };
+    //this.ctx = {
+      //workspace: '/workspace/711891',
+      //project: null
+    //};
 
-    //this.ctx = this.getContext().getDataContext();
+    this.ctx = this.getContext().getDataContext();
 
     this.fidTemplate = Rally.nav.DetailLink;
     this.cardTemplate = new Ext.XTemplate(
@@ -531,7 +531,7 @@ Ext.define('CustomApp', {
       .filter(function (f) { return projectRef(f) === projectId; })
       .map(function (f) { return parentRef(f); })
       .unique()
-      .each(function (i) { 
+      .each(function (i) {
         container.add(me.addInitiative(projectId, releaseName, i));
       });
 
@@ -583,7 +583,7 @@ Ext.define('CustomApp', {
       })
       .unique()
       .filter(function (f) { return projectRef(f) === projectId; })
-      .each(function (f) { 
+      .each(function (f) {
         featureContainer.add(me.addFeature(projectId, initiativeId, f.get('_ref')));
       });
 
