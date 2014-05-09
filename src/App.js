@@ -12,7 +12,7 @@ var mapRefObjToOid = function mapRefObjToOid(ref) {
   return ref.getOid();
 };
 
-var oidFromRef = function (ref) { 
+var oidFromRef = function (ref) {
   return Rally.util.Ref.getOidFromRef(ref);
 };
 
@@ -58,12 +58,12 @@ Ext.define('CustomApp', {
 
     this.addEvents('load');
 
-    //this.ctx = {
-      //workspace: '/workspace/711891',
-      //project: null
-    //};
-
     this.ctx = this.getContext().getDataContext();
+
+    this.ctx = {
+      workspace: '/workspace/711891',
+      project: null
+    };
 
     this.fidTemplate = Rally.nav.DetailLink;
     this.cardTemplate = new Ext.XTemplate(
@@ -121,8 +121,6 @@ Ext.define('CustomApp', {
 
     var ctx = me.getContext().getDataContext();
     var selectedReleases;
-    ctx.projectScopeUp = false;
-    ctx.projectScopeDown = false;
 
     this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
       title: 'Select Releases',
@@ -135,7 +133,7 @@ Ext.define('CustomApp', {
         model: 'Release',
         itemId: 'releasechoosergrid',
         storeConfig: {
-          context: ctx
+          context: _.merge(ctx, { projectScopeUp: false, projectScopeDown: false })
         },
         columnCfgs: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
         selModel: Ext.create('Rally.ui.selection.CheckboxModel', {
@@ -345,17 +343,17 @@ Ext.define('CustomApp', {
 
     var releaseStore = Ext.create('Rally.data.wsapi.Store', {
       model: 'Release',
-      context: me.ctx,
+      context: _.merge(me.ctx, { projectScopeUp: false, projectScopeDown: false }),
       fetch: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
-      filters: [{
-        property: 'ReleaseStartDate',
-        operator: '>=',
-        value: this._getStartDate()
-      }, {
-        property: 'ReleaseDate',
-        operator: '<=',
-        value: this._getEndDate()
-      }],
+      //filters: [{
+        //property: 'ReleaseStartDate',
+        //operator: '>=',
+        //value: this._getStartDate()
+      //}, {
+        //property: 'ReleaseDate',
+        //operator: '<=',
+        //value: this._getEndDate()
+      //}],
       sorters: [{
         property: 'ReleaseStartDate',
         direction: 'ASC'
@@ -485,7 +483,7 @@ Ext.define('CustomApp', {
       });
     });
 
-    _.each(_.keys(me.projects), function (p) {
+    _.each(_(me.projects).keys().sortBy(function (k) { return me.projects[k].raw.Name; }).value(), function (p) {
       if (_(me.features).filter(function (f) { return projectRef(f) === p; }).value().length) {
         me.addProject(p);
       }
