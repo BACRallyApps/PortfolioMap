@@ -422,6 +422,8 @@ Ext.define('CustomApp', {
   },
 
   processFeatures: function (features) {
+    var releases = _.keys(this.selectedReleases);
+    features = _.filter(features, function (f) { return f.raw.Release && _.contains(release, f.raw.Release.ObjectID); });
     this.featureRecs          = features;
     this.features             = _.indexBy(features, function (feature) { return feature.get('_ref'); });
     this.featuresByInitiative = _.groupBy(features, function (f) { return parentRef(f); });
