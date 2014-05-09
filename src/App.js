@@ -155,7 +155,7 @@ Ext.define('CustomApp', {
       }],
       listeners: {
         close: function () {
-          me.fireEvent('selectedreleaseschanged', selectedReleases)
+          me.fireEvent('selectedreleaseschanged', selectedReleases);
         }
       }
     });
@@ -247,6 +247,10 @@ Ext.define('CustomApp', {
     //me.chooseReleases();
 
     me.subscribe(me, Rally.Message.objectUpdate, me._onObjectUpdated, me);
+    me.on('selectedreleaseschanged', function (selectedReleases) {
+      me.selectedReleases = selectedReleases;
+      me.preInit();
+    });
 
     Ext.create('Rally.data.wsapi.Store', {
       autoLoad: true,
