@@ -155,6 +155,7 @@ Ext.define('CustomApp', {
       }],
       listeners: {
         close: function () {
+          console.log('selected releases changes', selectedReleases);
           me.fireEvent('selectedreleaseschanged', selectedReleases);
         }
       }
@@ -248,6 +249,7 @@ Ext.define('CustomApp', {
 
     me.subscribe(me, Rally.Message.objectUpdate, me._onObjectUpdated, me);
     me.on('selectedreleaseschanged', function (selectedReleases) {
+      console.log('fire!', arguments);
       me.selectedReleases = selectedReleases;
       me.preInit();
     });
