@@ -448,7 +448,6 @@ Ext.define('CustomApp', {
     releases = _.filter(releases, function (release) { return me.selectedReleases[release.get('ObjectID')]; });
 
     this.releases = _(releases)
-      .filter(function (release) { return me.selectedReleases[release.get('ObjectID')]; })
       .unique(function (release) { return release.get('Name'); })
       .groupBy(function (release) { return release.get('Name'); })
       .value();
