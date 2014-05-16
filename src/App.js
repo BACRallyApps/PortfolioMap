@@ -44,7 +44,7 @@ Ext.define('CustomApp', {
   features: null,
   initiatives: null,
   releases: null,
-  selectedReleases: {},
+  selectedReleases: null, 
 
   layout: {
     type: 'vbox'
@@ -149,7 +149,8 @@ Ext.define('CustomApp', {
         }),
         listeners: {
           load: function (t) {
-            me.releaseChooserDlg.down('#releasechoosergrid').getSelectionModel().select(_.values(me.selectedReleases), false, true);
+            var sr = me.selectedReleases || {};
+            me.releaseChooserDlg.down('#releasechoosergrid').getSelectionModel().select(_.values(sr), false, true);
           }
         }
       }],
@@ -296,15 +297,22 @@ Ext.define('CustomApp', {
     me.projects = null;
 
     me.removeAll(true);
-    me.loadData();
+
+    if (!me.selectedReleases || _.keys(me.selectedReleases).length === 0) {
+      me.chooseReleases();
+    } else {
+      me.loadData();
+    }
   },
 
   _getStartDate: function () {
-    return Rally.util.DateTime.toIsoString(new Date(2014, 0, 1));
+    var rel = _(this.selectedReleases).sortBy(function (r) { return r.data.ReleaseStartDate; }).first();
+    return Rally.util.DateTime.toIsoString(rel.data.ReleaseStartDate);
   },
 
   _getEndDate: function () {
-    return Rally.util.DateTime.toIsoString(new Date(2014, 11, 31));
+    var rel = _(this.selectedReleases).sortBy(function (r) { return r.data.ReleaseDate; }).last();
+    return Rally.util.DateTime.toIsoString(rel.data.ReleaseDate);
   },
 
   loadData: function () {
@@ -351,15 +359,15 @@ Ext.define('CustomApp', {
       model: 'Release',
       context: _.merge(me.ctx, { projectScopeUp: false, projectScopeDown: false }),
       fetch: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
-      //filters: [{
-        //property: 'ReleaseStartDate',
-        //operator: '>=',
-        //value: this._getStartDate()
-      //}, {
-        //property: 'ReleaseDate',
-        //operator: '<=',
-        //value: this._getEndDate()
-      //}],
+      filters: [{
+        property: 'ReleaseStartDate',
+        operator: '>=',
+        value: this._getStartDate()
+      }, {
+        property: 'ReleaseDate',
+        operator: '<=',
+        value: this._getEndDate()
+      }],
       sorters: [{
         property: 'ReleaseStartDate',
         direction: 'ASC'
@@ -443,13 +451,13 @@ Ext.define('CustomApp', {
       .groupBy(function (release) { return release.get('Name'); })
       .value();
     this.releaseRecs = releases;
-    this.releaseNameByDate = _(this.releases)
+    this.releaseNameByDate = _(releases)
       .unique(function (r) { return r.get('Name'); })
       .sortBy(function (r) { return r.get('ReleaseStartDate'); })
       .map(function (r) { return r.get('Name'); })
       .value();
 
-    //console.log('rels by date', this.releaseNameByDate);
+    console.log('rels by date', this.releaseNameByDate);
   },
 
   _onLoad: function () {
