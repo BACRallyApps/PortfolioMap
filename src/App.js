@@ -44,7 +44,7 @@ Ext.define('CustomApp', {
   features: null,
   initiatives: null,
   releases: null,
-  selectedReleases: null, 
+  selectedReleases: null,
 
   layout: {
     type: 'vbox'
@@ -57,13 +57,6 @@ Ext.define('CustomApp', {
     this.mixins.observable.constructor.call(this, config);
 
     this.addEvents('load');
-
-    this.ctx = this.getContext().getDataContext();
-
-    this.ctx = {
-      workspace: '/workspace/711891',
-      project: null
-    };
 
     this.fidTemplate = Rally.nav.DetailLink;
     this.cardTemplate = new Ext.XTemplate(
@@ -124,6 +117,7 @@ Ext.define('CustomApp', {
 
     this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
       title: 'Select Releases',
+      itemId: 'dialog',
       draggable: true,
       width: 800,
       closable: true,
@@ -154,10 +148,23 @@ Ext.define('CustomApp', {
           }
         }
       }],
-      listeners: {
-        hide: function () {
+      bbar: [{
+        xtype: 'rallybutton',
+        text: 'Cancel',
+        handler: function (source, evt) {
+          source.up('#dialog').hide();
+        }
+      }, {
+        xtype: 'rallybutton',
+        text: 'Save',
+        handler: function (source, evt) {
           console.log('selected releases changes', selectedReleases);
           me.fireEvent('selectedreleaseschanged', selectedReleases);
+          source.up('#dialog').hide();
+        }
+      }],
+      listeners: {
+        hide: function () {
         }
       }
     });
@@ -246,6 +253,13 @@ Ext.define('CustomApp', {
   launch: function launch() {
     var me = this;
 
+    me.ctx = me.getContext().getDataContext();
+
+    //me.ctx = {
+      //workspace: '/workspace/711640',
+      //project: '/project/4878215'
+    //};
+
     //me.chooseReleases();
 
     me.subscribe(me, Rally.Message.objectUpdate, me._onObjectUpdated, me);
@@ -255,6 +269,7 @@ Ext.define('CustomApp', {
       me.preInit();
     });
 
+    console.log('ctx', me.ctx);
     Ext.create('Rally.data.wsapi.Store', {
       autoLoad: true,
       remoteFilter: false,
