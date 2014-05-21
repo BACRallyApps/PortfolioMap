@@ -157,20 +157,32 @@ Ext.define('CustomApp', {
           }
         }
       }],
-      bbar: [{
-        xtype: 'rallybutton',
-        text: 'Cancel',
-        handler: function (source, evt) {
-          source.up('#dialog').hide();
-        }
-      }, {
-        xtype: 'rallybutton',
-        text: 'Save',
-        handler: function (source, evt) {
-          console.log('selected releases changes', selectedReleases);
-          me.fireEvent('selectedreleaseschanged', selectedReleases);
-          source.up('#dialog').hide();
-        }
+      dockedItems: [{
+        xtype: 'toolbar',
+        dock: 'bottom',
+        style: {
+          'background-color': '#fff',
+          'border': '#d6d6d6'
+        },
+        items: [{
+            xtype: 'tbfill'
+          }, {
+          xtype: 'rallybutton',
+          text: 'Cancel',
+          handler: function (source, evt) {
+            source.up('#dialog').hide();
+          }
+        }, {
+          xtype: 'rallybutton',
+          text: 'Save',
+          handler: function (source, evt) {
+            console.log('selected releases changes', selectedReleases);
+            me.fireEvent('selectedreleaseschanged', selectedReleases);
+            source.up('#dialog').hide();
+          }
+        }, {
+          xtype: 'tbfill'
+        }]
       }],
       listeners: {
         hide: function () {
