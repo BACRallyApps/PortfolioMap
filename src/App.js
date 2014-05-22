@@ -84,8 +84,8 @@ Ext.define('CustomApp', {
 
   getSettingsFields: function () {
     var fields = [{
-      name: 'storyCardsPerColumn',
-      label: 'Story Cards per Column',
+      name: 'featureCardsPerColumn',
+      label: 'Feature Cards per Column',
       xtype: 'rallynumberfield'
     }];
 
@@ -158,21 +158,21 @@ Ext.define('CustomApp', {
         items: [{
             xtype: 'tbfill'
           }, {
-          xtype: 'rallybutton',
-          text: 'Cancel',
-          handler: function (source, evt) {
-            source.up('#dialog').hide();
-          }
-        }, {
-          xtype: 'rallybutton',
-          text: 'Save',
-          handler: function (source, evt) {
-            console.log('selected releases changes', selectedReleases);
-            me.fireEvent('selectedreleaseschanged', selectedReleases);
-            source.up('#dialog').hide();
-          }
-        }, {
-          xtype: 'tbfill'
+            xtype: 'rallybutton',
+            text: 'Cancel',
+            handler: function (source, evt) {
+              source.up('#dialog').hide();
+            }
+          }, {
+            xtype: 'rallybutton',
+            text: 'Save',
+            handler: function (source, evt) {
+              console.log('selected releases changes', selectedReleases);
+              me.fireEvent('selectedreleaseschanged', selectedReleases);
+              source.up('#dialog').hide();
+            }
+          }, {
+            xtype: 'tbfill'
         }]
       }],
       listeners: {
@@ -276,12 +276,10 @@ Ext.define('CustomApp', {
 
     me.subscribe(me, Rally.Message.objectUpdate, me._onObjectUpdated, me);
     me.on('selectedreleaseschanged', function (selectedReleases) {
-      console.log('fire!', arguments);
       me.selectedReleases = selectedReleases;
       me.preInit();
     });
 
-    console.log('ctx', me.ctx);
     Ext.create('Rally.data.wsapi.Store', {
       autoLoad: true,
       remoteFilter: false,
@@ -511,7 +509,7 @@ Ext.define('CustomApp', {
       layout: 'fit',
       html: me.headerTemplate.apply({
         width:        (Ext.get(me.getEl()).getWidth() - 10) + "px",
-        name:         'Portfolio Map',
+        name:         me.getContext().getProject().Name + '- Portfolio Map',
         accepted:     0,
         completed:    0,
         total:        0,
