@@ -124,11 +124,23 @@ Ext.define('CustomApp', {
     var ctx = me.getContext().getDataContext();
     var selectedReleases = {};
 
+    var createReleaseFilter = function() {
+        var filter = Ext.create('Rally.data.wsapi.Filter', {
+          property : 'ReleaseDate', 
+          operator : '>', 
+          value : Rally.util.DateTime.toIsoString(new Date(), false) 
+        });
+
+        return filter;
+    };
+
+
     this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
       title: 'Select Releases',
       itemId: 'dialog',
       draggable: true,
-      width: 800,
+      height : 300,
+      width: 600,
       closable: true,
       closeAction: 'hide',
       items: [{
@@ -136,7 +148,8 @@ Ext.define('CustomApp', {
         model: 'Release',
         itemId: 'releasechoosergrid',
         storeConfig: {
-          context: _.merge(ctx, { projectScopeUp: false, projectScopeDown: false })
+          context: _.merge(ctx, { projectScopeUp: false, projectScopeDown: false }),
+          filters : [createReleaseFilter()]
         },
         columnCfgs: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
         selModel: Ext.create('Rally.ui.selection.CheckboxModel', {
@@ -785,16 +798,13 @@ Ext.define('CustomApp', {
   width: 100%;
   height: 100%;
 }
-
 .app {
-     /* Add app styles here */
+  /* Add app styles here */
 }
-
 .rotate-parent {
   width: 50px;
   min-height: 250px;
 }
-
 .rotate {
   margin: auto 0;
   text-align: right;
@@ -804,20 +814,22 @@ Ext.define('CustomApp', {
   right: -130px;
   /*left: -123px;*/
   font-size: 16px;
-
-     -moz-transform: rotate(-90.0deg);  /* FF3.5+ */
-       -o-transform: rotate(-90.0deg);  /* Opera 10.5 */
-  -webkit-transform: rotate(-90.0deg);  /* Saf3.1+, Chrome */
-             filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=3);  /* IE6,IE7 */
-         -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)"; /* IE8 */
+  -moz-transform: rotate(-90deg);
+  /* FF3.5+ */
+  -o-transform: rotate(-90deg);
+  /* Opera 10.5 */
+  -webkit-transform: rotate(-90deg);
+  /* Saf3.1+, Chrome */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+  /* IE6,IE7 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";
+  /* IE8 */
 }
-
 .rotate-ie {
   right: 0px;
   left: 15px;
   top: 50px;
 }
-
 .card {
   text-align: center;
   border: solid 1px #999;
@@ -825,11 +837,9 @@ Ext.define('CustomApp', {
   padding: 5px;
   font-size: 12px;
 }
-
 .card p {
   text-align: center;
 }
-
 .release {
   border-top: none;
   border-right: none;
@@ -843,30 +853,26 @@ Ext.define('CustomApp', {
   font-size: 16px;
   font-width: bold;
 }
-
 .release p {
   text-align: left;
 }
-
 .feature {
   width: 150px;
 }
-
 .header {
   text-align: center;
   height: auto;
   margin-bottom: 10px;
 }
-
 .header h1 {
   font-size: 18px;
 }
-
 .header .info {
-  font-size: 12px
+  font-size: 12px;
 }
 
     </style>
 </head>
-<body></body>
+<body>
+</body>
 </html>

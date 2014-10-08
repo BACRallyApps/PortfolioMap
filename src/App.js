@@ -115,11 +115,23 @@ Ext.define('CustomApp', {
     var ctx = me.getContext().getDataContext();
     var selectedReleases = {};
 
+    var createReleaseFilter = function() {
+        var filter = Ext.create('Rally.data.wsapi.Filter', {
+          property : 'ReleaseDate', 
+          operator : '>', 
+          value : Rally.util.DateTime.toIsoString(new Date(), false) 
+        });
+
+        return filter;
+    };
+
+
     this.releaseChooserDlg = Ext.create('Rally.ui.dialog.Dialog', {
       title: 'Select Releases',
       itemId: 'dialog',
       draggable: true,
-      width: 800,
+      height : 300,
+      width: 600,
       closable: true,
       closeAction: 'hide',
       items: [{
@@ -127,7 +139,8 @@ Ext.define('CustomApp', {
         model: 'Release',
         itemId: 'releasechoosergrid',
         storeConfig: {
-          context: _.merge(ctx, { projectScopeUp: false, projectScopeDown: false })
+          context: _.merge(ctx, { projectScopeUp: false, projectScopeDown: false }),
+          filters : [createReleaseFilter()]
         },
         columnCfgs: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
         selModel: Ext.create('Rally.ui.selection.CheckboxModel', {
