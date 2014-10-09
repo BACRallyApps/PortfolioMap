@@ -125,11 +125,26 @@ Ext.define('CustomApp', {
     var selectedReleases = {};
 
     var createReleaseFilter = function() {
+        var today = new Date();
+        var sixMonthsAgo = new Date();
+        var sixMonthsAhead = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        sixMonthsAhead.setMonth(sixMonthsAhead.getMonth() + 6);
+        console.log("Release selection dates",sixMonthsAgo,sixMonthsAhead);
+
         var filter = Ext.create('Rally.data.wsapi.Filter', {
           property : 'ReleaseDate', 
-          operator : '>', 
-          value : Rally.util.DateTime.toIsoString(new Date(), false) 
+          operator : '>=', 
+          value : Rally.util.DateTime.toIsoString(sixMonthsAgo, false)
         });
+
+        filter = filter.and(
+          Ext.create('Rally.data.wsapi.Filter', {
+          property : 'ReleaseDate', 
+          operator : '<=', 
+          value : Rally.util.DateTime.toIsoString(sixMonthsAhead, false)
+          })
+        );
 
         return filter;
     };
@@ -139,11 +154,12 @@ Ext.define('CustomApp', {
       title: 'Select Releases',
       itemId: 'dialog',
       draggable: true,
-      height : 300,
+      height : 350,
       width: 600,
       closable: true,
       closeAction: 'hide',
       items: [{
+        height : 275,
         xtype: 'rallygrid',
         model: 'Release',
         itemId: 'releasechoosergrid',
