@@ -137,6 +137,8 @@ Ext.define('CustomApp', {
           })
         );
 
+        console.log(filter.toString());
+
         return filter;
     };
 
@@ -343,6 +345,7 @@ Ext.define('CustomApp', {
   },
 
   preInit: function () {
+    console.log("preInit");
     var me = this;
 
     me.initiatives = null;
@@ -370,11 +373,13 @@ Ext.define('CustomApp', {
   },
 
   loadData: function () {
+    console.log("loadData");
     var me = this;
 
     me.showMask("Loading...");
 
     var featureStore = Ext.create('Rally.data.wsapi.Store', {
+      limit : "Infinity",
       model: me.piTypes[0].get('TypePath'),
       fetch: ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor', 'Release'],
       context: me.ctx,
@@ -404,12 +409,14 @@ Ext.define('CustomApp', {
     //});
 
     var projectStore = Ext.create('Rally.data.wsapi.Store', {
+      limit : "Infinity",
       model: 'Project',
       context: me.ctx,
       fetch: true
     });
 
     var releaseStore = Ext.create('Rally.data.wsapi.Store', {
+      limit : "Infinity",
       model: 'Release',
       context: _.merge(me.ctx, { projectScopeUp: false, projectScopeDown: false }),
       fetch: ['Name', 'ReleaseStartDate', 'ReleaseDate'],
@@ -448,6 +455,7 @@ Ext.define('CustomApp', {
 
     Deft.promise.Promise.all([releaseStore.load(), projectStore.load(), featureStore.load(), nullInitiative.promise])
       .then(function (data) {
+        console.log("data",data);
         var releases            = data[0],
             projects            = data[1],
             features            = data[2],
