@@ -74,7 +74,7 @@ Ext.define('CustomApp', {
         '<div class="name"><h1>{name}</h1></div>',
         '<div class="info">',
           '{accepted} of {total} Story Points are done. ',
-          '{[ values.completed - values.accepted ]} Story Points are awaiting approval. ',
+          // '{[ values.completed - values.accepted ]} Story Points are awaiting approval. ',
           '{[ values.total - values.accepted ]} Story Points remaining. ',
           '<tpl if="notEstimated"><span style="color: red">{notEstimated} Stories are not estimated.</span></tpl>',
         '</div>',
@@ -381,7 +381,8 @@ Ext.define('CustomApp', {
     var featureStore = Ext.create('Rally.data.wsapi.Store', {
       limit : "Infinity",
       model: me.piTypes[0].get('TypePath'),
-      fetch: ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor', 'Release'],
+      // fetch: ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor', 'Release'],
+      fetch: ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor', 'Release', 'LeafStoryPlanEstimateTotal', 'AcceptedLeafStoryPlanEstimateTotal','UnEstimatedLeafStoryCount'],
       context: me.ctx,
       filters: [{
         property: 'Release.ReleaseStartDate',
@@ -523,6 +524,7 @@ Ext.define('CustomApp', {
   },
 
   _onLoad: function () {
+    console.log("_onLoad");
     var me = this;
 
     me.hideMask();
@@ -539,6 +541,17 @@ Ext.define('CustomApp', {
       .groupBy(function (f) { return f.raw.Release._refObjectName; })
       .value();
 
+    console.log("featuresByRelease",me.featuresByRelease);
+
+    var total = function(features,field) {
+      // console.log("features",_.flatten(_.values(features)));
+      return _.reduce(_.flatten(_.values(features)),function(memo,feature) {
+        // console.log("feature",feature.get("FormattedID"), field, feature.get(field),feature);
+        return memo + 
+          ( !_.isUndefined(feature.get(field)) && !_.isNull(feature.get(field)) ? feature.get(field) : 0)
+      },0);
+    };
+
     me.suspendLayouts();
 
     me.addToContainer({
@@ -547,10 +560,10 @@ Ext.define('CustomApp', {
       html: me.headerTemplate.apply({
         width:        (Ext.get(me.getEl()).getWidth() - 10) + "px",
         name:         me.getContext().getProject().Name + '- Portfolio Map',
-        accepted:     0,
-        completed:    0,
-        total:        0,
-        notEstimated: 0
+        accepted:     total(me.featuresByRelease,"AcceptedLeafStoryPlanEstimateTotal"),
+        // completed:    0,
+        total:        total(me.featuresByRelease,"LeafStoryPlanEstimateTotal"),
+        notEstimated: total(me.featuresByRelease,"UnEstimatedLeafStoryCount")
       })
     });
 
@@ -764,7 +777,10 @@ Ext.define('CustomApp', {
     var fetch, fetchS, fetchF;
     var dataFn;
 
-    fetchF = ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'UserStories', 'Children', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor'];
+    fetchF = ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 
+              'UserStories', 'Children', 'PreliminaryEstimate', 'DirectChildrenCount', 
+              'LeafStoryPlanEstimateTotal', 'DisplayColor','AcceptedLeafStoryPlanEstimateTotal',
+              'UnEstimatedLeafStoryCount'];
 
     if (record.get('_type').toLowerCase().indexOf('portfolioitem') !== -1) {
       fetch = fetchF;

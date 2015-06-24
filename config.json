@@ -1,7 +1,7 @@
 {
    "name": "FeatureMap",
    "className": "CustomApp",
-   "server": "https://demo-east.rallydev.com",
+   "server": "https://rally1.rallydev.com",
    "sdk": "2.0rc3",
    "remote_javascript": [],
    "javascript": [
