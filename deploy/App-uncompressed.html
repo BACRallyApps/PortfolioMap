@@ -83,7 +83,7 @@ Ext.define('CustomApp', {
         '<div class="name"><h1>{name}</h1></div>',
         '<div class="info">',
           '{accepted} of {total} Story Points are done. ',
-          '{[ values.completed - values.accepted ]} Story Points are awaiting approval. ',
+          // '{[ values.completed - values.accepted ]} Story Points are awaiting approval. ',
           '{[ values.total - values.accepted ]} Story Points remaining. ',
           '<tpl if="notEstimated"><span style="color: red">{notEstimated} Stories are not estimated.</span></tpl>',
         '</div>',
@@ -390,7 +390,8 @@ Ext.define('CustomApp', {
     var featureStore = Ext.create('Rally.data.wsapi.Store', {
       limit : "Infinity",
       model: me.piTypes[0].get('TypePath'),
-      fetch: ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor', 'Release'],
+      // fetch: ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor', 'Release'],
+      fetch: ['ObjectID', 'FormattedID', 'Name', 'Value', 'Parent', 'Project', 'PreliminaryEstimate', 'DirectChildrenCount', 'LeafStoryPlanEstimateTotal', 'DisplayColor', 'Release', 'LeafStoryPlanEstimateTotal', 'AcceptedLeafStoryPlanEstimateTotal','UnEstimatedLeafStoryCount'],
       context: me.ctx,
       filters: [{
         property: 'Release.ReleaseStartDate',
@@ -552,7 +553,9 @@ Ext.define('CustomApp', {
     console.log("featuresByRelease",me.featuresByRelease);
 
     var total = function(features,field) {
-      return _.reduce(features,function(memo,feature) {
+      // console.log("features",_.flatten(_.values(features)));
+      return _.reduce(_.flatten(_.values(features)),function(memo,feature) {
+        // console.log("feature",feature.get("FormattedID"), field, feature.get(field),feature);
         return memo + 
           ( !_.isUndefined(feature.get(field)) && !_.isNull(feature.get(field)) ? feature.get(field) : 0)
       },0);
